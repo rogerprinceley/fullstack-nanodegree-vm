@@ -17,7 +17,7 @@ def deleteMatches():
     """Remove all the match records from the database."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""UPDATE players SET (wins, matches) = (0, 0);""")
+    cursor.execute("""TRUNCATE TABLE matches;""")
     connection.commit()
     connection.close()
 
@@ -25,7 +25,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""TRUNCATE TABLE players;""")
+    cursor.execute("""TRUNCATE TABLE players CASCADE;""")
     connection.commit()
     connection.close()
 
@@ -49,7 +49,7 @@ def registerPlayer(name):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""INSERT INTO players (name, wins, matches) VALUES (%s, 0, 0);""", [name])
+    cursor.execute("""INSERT INTO players (name) VALUES (%s);""", [name])
     connection.commit()
     connection.close()
 
@@ -66,12 +66,7 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    connection = connect()
-    cursor = connection.cursor()
-    cursor.execute("""SELECT player_id, name, wins, matches FROM players;""")
-    result = cursor.fetchall()
-    connection.close()
-    return result
+
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -82,8 +77,7 @@ def reportMatch(winner, loser):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""UPDATE players SET (wins, matches) = (wins+1, matches+1) WHERE player_id=%s;""", [winner])
-    cursor.execute("""UPDATE players SET (matches) = (matches+1) WHERE player_id=%s;""", [loser])
+    cursor.execute("""INSERT INTO matches (player1, player2, winner) VALUES (%s, %s, %s);""" % (winner, loser, winner))
     connection.commit()
     connection.close()
  
@@ -102,28 +96,4 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    connection = connect()
-    cursor = connection.cursor()
-    cursor.execute("""SELECT count(*) FROM players WHERE matches <> 0;""")
-    result = cursor.fetchone()
-    connection.close()
-    
-    if result==0:
-        connection = connect()
-        cursor = connection.cursor()
-        cursor.execute("""SELECT player_id, name FROM players ORDER BY random();""")
-        result = cursor.fetchall()
-        connection.close()
-    else:
-        connection = connect()
-        cursor = connection.cursor()
-        cursor.execute("""SELECT player_id, name FROM players ORDER BY wins;""") 
-        result = cursor.fetchall()
-        connection.close()
-
-    # courtesy of 
-    # http://stackoverflow.com/questions/756550/multiple-tuple-to-two-pair-tuple-in-python
-    # http://stackoverflow.com/questions/509211/explain-pythons-slice-notation
-    ids, names =  zip(*result)
-    return zip(ids[::2], names[::2], ids[1::2], names[1::2]) 
 
