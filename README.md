@@ -19,4 +19,6 @@ This project contains a database and python code that provide tools to assist in
 
 # Project contents - INCOMPLETE
 
+# References
+This project runs on code provided by the course [Intro to Relational Databases](https://www.udacity.com/course/intro-to-relational-databases--ud197-nd) at [Udacity](http://www.udacity.com)
 
