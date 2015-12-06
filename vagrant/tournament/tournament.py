@@ -68,7 +68,7 @@ def playerStandings():
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT player_id, name, wins, matches FROM players;""")
+    cursor.execute("""SELECT player_id, name, wins, matches FROM players ORDER BY wins;""")
     result = cursor.fetchall()
     connection.close()
     return result
