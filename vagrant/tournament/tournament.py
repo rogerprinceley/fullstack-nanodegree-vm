@@ -1,23 +1,21 @@
-#!/usr/bin/env python
-# 
-# tournament.py -- implementation of a Swiss-system tournament
-#
-#
+"""tournament module
 
+This module attempts to provide all the tools necessary to track a Swiss-Style tournament.
+"""
 
 import psycopg2
-
+import random
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    return psycopg2.connect("dbname=tournament_step1")
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""UPDATE players SET (wins, matches) = (0, 0);""")
+    cursor.execute("""TRUNCATE TABLE results CASCADE; TRUNCATE TABLE matches CASCADE;""")
     connection.commit()
     connection.close()
 
@@ -25,7 +23,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""TRUNCATE TABLE players;""")
+    cursor.execute("""TRUNCATE TABLE players CASCADE;""")
     connection.commit()
     connection.close()
 
@@ -49,7 +47,7 @@ def registerPlayer(name):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""INSERT INTO players (name, wins, matches) VALUES (%s, 0, 0);""", [name])
+    cursor.execute("""INSERT INTO players (name) VALUES (%s);""", [name])
     connection.commit()
     connection.close()
 
@@ -68,7 +66,7 @@ def playerStandings():
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT player_id, name, wins, matches FROM players ORDER BY wins;""")
+    cursor.execute("""SELECT player_id, name, wins, matches FROM v_standings;""")
     result = cursor.fetchall()
     connection.close()
     return result
@@ -82,8 +80,10 @@ def reportMatch(winner, loser):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""UPDATE players SET (wins, matches) = (wins+1, matches+1) WHERE player_id=%s;""", [winner])
-    cursor.execute("""UPDATE players SET (matches) = (matches+1) WHERE player_id=%s;""", [loser])
+    cursor.execute("""INSERT INTO matches (player1, player2) VALUES (%s, %s) RETURNING match_id;""", [winner, loser])
+    result = cursor.fetchone()
+    match_id = result[0]
+    cursor.execute("""INSERT INTO results (match_id, winner) VALUES (%s, %s);""", [match_id, winner])
     connection.commit()
     connection.close()
  
@@ -104,20 +104,22 @@ def swissPairings():
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT count(*) FROM players WHERE matches <> 0;""")
+    cursor.execute("""SELECT count(*) FROM v_standings WHERE matches <> 0;""")
     result = cursor.fetchone()
-    connection.close()
-    
-    if result==0:
+    connection.close()   
+ 
+    if result[0]==0:
+        seed = random.uniform(-1.0, 1.0)
         connection = connect()
         cursor = connection.cursor()
-        cursor.execute("""SELECT player_id, name FROM players ORDER BY random();""")
+        cursor.execute("""SELECT setseed(%s);""", [seed])
+        cursor.execute("""SELECT player_id, name FROM v_standings ORDER BY random();""")
         result = cursor.fetchall()
         connection.close()
     else:
         connection = connect()
         cursor = connection.cursor()
-        cursor.execute("""SELECT player_id, name FROM players ORDER BY wins;""") 
+        cursor.execute("""SELECT player_id, name FROM v_standings ORDER BY wins;""") 
         result = cursor.fetchall()
         connection.close()
 
