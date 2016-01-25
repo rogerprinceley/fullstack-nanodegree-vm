@@ -50,6 +50,7 @@ This project contains SQL and python code that provide tools to assist in conduc
 
 * The tournament project is based off the course [Intro to Relational Databases](https://www.udacity.com/course/intro-to-relational-databases--ud197-nd) at [Udacity](http://www.udacity.com)
 * The tournament project Getting Started guide can be found [here](https://docs.google.com/document/d/16lgOm4XprTaKxAa8w02y028oBECOoB1El1ReddADEeY/pub?embedded=true)
+* Referred to tiebreaker information for MTG [here](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
 
 ## Pending Projects
 
