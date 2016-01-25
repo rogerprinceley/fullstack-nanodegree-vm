@@ -44,9 +44,9 @@ This project contains SQL and python code that provide tools to assist in conduc
 
 #### Extra credit options attempted
 1. Prevent rematches between players
-..* Uses a modified Depth-First Search algorithm using a recursive function.
+⋅⋅* Uses a modified Depth-First Search algorithm using a recursive function.
 2. When two players have the same number of wins, rank them according to OMW (Opponent Match Wins), the total number of wins by players they have played against.
-..* Implementation does not use points as outlined in the MTG [tiebreaker guide.]((https://www.wizards.com/dci/downloads/tiebreakers.pdf)
+⋅⋅* Implementation does not use points as outlined in the MTG [tiebreaker guide.]((https://www.wizards.com/dci/downloads/tiebreakers.pdf)
 
 #### References
 
