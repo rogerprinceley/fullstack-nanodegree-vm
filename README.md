@@ -46,13 +46,13 @@ This project contains SQL and python code that provide tools to assist in conduc
 1. Prevent rematches between players
   * Uses a modified Depth-First Search algorithm using a recursive function.
 2. When two players have the same number of wins, rank them according to OMW (Opponent Match Wins), the total number of wins by players they have played against.
-  * Implementation does not use points as outlined in the MTG [tiebreaker guide.](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
+  * Implementation does not use points as outlined in the [MTG tiebreaker guide.](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
 
 #### References
 
 * The tournament project is based off the course [Intro to Relational Databases](https://www.udacity.com/course/intro-to-relational-databases--ud197-nd) at [Udacity](http://www.udacity.com)
 * The tournament project Getting Started guide can be found [here](https://docs.google.com/document/d/16lgOm4XprTaKxAa8w02y028oBECOoB1El1ReddADEeY/pub?embedded=true)
-* Details on Opponent Match Wins information can be found [here.](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
+* Details on Opponent Match Wins information can be found in the [MTG tiebreaker guide.](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
 
 ## Pending Projects
 
