@@ -18,7 +18,7 @@ def deleteMatches():
     """Remove all the match records from the database."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""TRUNCATE TABLE results CASCADE; TRUNCATE TABLE matches CASCADE;""")
+    cursor.execute('TRUNCATE TABLE results CASCADE; TRUNCATE TABLE matches CASCADE;')
     connection.commit()
     connection.close()
 
@@ -27,7 +27,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""TRUNCATE TABLE players CASCADE;""")
+    cursor.execute('TRUNCATE TABLE players CASCADE;')
     connection.commit()
     connection.close()
 
@@ -36,7 +36,7 @@ def countPlayers():
     """Returns the number of players currently registered."""
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT count(*) FROM players;""")
+    cursor.execute('SELECT count(*) FROM players;')
     result = cursor.fetchone()
     connection.close()
     return result[0]
@@ -53,7 +53,7 @@ def registerPlayer(name):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""INSERT INTO players (name) VALUES (%s);""", [name])
+    cursor.execute('INSERT INTO players (name) VALUES (%s);', [name])
     connection.commit()
     connection.close()
 
@@ -73,7 +73,7 @@ def playerStandings():
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT player_id, name, wins, matches FROM v_standings;""")
+    cursor.execute('SELECT player_id, name, wins, matches FROM v_standings;')
     result = cursor.fetchall()
     connection.close()
     return result
@@ -88,10 +88,10 @@ def reportMatch(winner, loser):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""INSERT INTO matches (player1, player2) VALUES (%s, %s) RETURNING match_id;""", [winner, loser])
+    cursor.execute('INSERT INTO matches (player1, player2) VALUES (%s, %s) RETURNING match_id;', [winner, loser])
     result = cursor.fetchone()
     match_id = result[0]
-    cursor.execute("""INSERT INTO results (match_id, winner) VALUES (%s, %s);""", [match_id, winner])
+    cursor.execute('INSERT INTO results (match_id, winner) VALUES (%s, %s);', [match_id, winner])
     connection.commit()
     connection.close()
  
@@ -113,7 +113,7 @@ def swissPairings():
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT count(*) FROM v_standings WHERE matches <> 0;""")
+    cursor.execute('SELECT count(*) FROM v_standings WHERE matches <> 0;')
     result = cursor.fetchone()
 
     if result[0] > 0:
@@ -123,7 +123,7 @@ def swissPairings():
         # pairings is used to convert pairs into a single tuple
         pairings = []
         
-        cursor.execute("""SELECT player_id, name FROM v_standings;""")
+        cursor.execute('SELECT player_id, name FROM v_standings;')
         result = cursor.fetchall()
         
         if matchMaker(result, pairs):
@@ -136,9 +136,9 @@ def swissPairings():
     seed = random.uniform(-1.0, 1.0)
 
     # Seed postgres with the generated seed
-    cursor.execute("""SELECT setseed(%s);""", [seed])
+    cursor.execute('SELECT setseed(%s);', [seed])
 
-    cursor.execute("""SELECT player_id, name FROM v_standings ORDER BY random();""")
+    cursor.execute('SELECT player_id, name FROM v_standings ORDER BY random();')
     result = cursor.fetchall()
     connection.close()
 
@@ -210,7 +210,8 @@ def hasPlayed(player1, player2):
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute("""SELECT count(*) FROM matches WHERE (player1=%s AND player2=%s) OR (player2=%s AND player1=%s);""", [player1[0], player2[0], player1[0], player2[0]])
+    cursor.execute('SELECT count(*) FROM matches WHERE (player1=%s AND player2=%s) OR (player2=%s AND player1=%s);', 
+                   [player1[0], player2[0], player1[0], player2[0]])
     result = cursor.fetchone()
     connection.close()
 
