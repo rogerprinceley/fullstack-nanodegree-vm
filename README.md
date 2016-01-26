@@ -57,6 +57,7 @@ This project contains SQL and python code that provide tools to assist in conduc
 * The tournament project is based off the course [Intro to Relational Databases](https://www.udacity.com/course/intro-to-relational-databases--ud197-nd) at [Udacity.](http://www.udacity.com)
 * The tournament project Getting Started guide can be found [here.](https://docs.google.com/document/d/16lgOm4XprTaKxAa8w02y028oBECOoB1El1ReddADEeY/pub?embedded=true)
 * Details on Opponent Match Wins information can be found in the [MTG tiebreaker guide.](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
+* Depth-First Search algorithm is inspired by the write up by Edd Mann [here.](http://eddmann.com/posts/depth-first-search-and-breadth-first-search-in-python/)
 
 ## Pending Projects
 
