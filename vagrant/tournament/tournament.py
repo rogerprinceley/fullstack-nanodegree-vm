@@ -1,14 +1,17 @@
+#!/usr/bin/env python
 """tournament module
 
-This module attempts to provide all the tools necessary to track a Swiss-Style tournament.
+This module is an implementation of a Swiss-system tournament
 """
+
 
 import psycopg2
 import random
 
+
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament_step1")
+    return psycopg2.connect("dbname=tournament")
 
 
 def deleteMatches():
@@ -19,6 +22,7 @@ def deleteMatches():
     connection.commit()
     connection.close()
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     connection = connect()
@@ -26,6 +30,7 @@ def deletePlayers():
     cursor.execute("""TRUNCATE TABLE players CASCADE;""")
     connection.commit()
     connection.close()
+
 
 def countPlayers():
     """Returns the number of players currently registered."""
@@ -35,6 +40,7 @@ def countPlayers():
     result = cursor.fetchone()
     connection.close()
     return result[0]
+
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -50,6 +56,7 @@ def registerPlayer(name):
     cursor.execute("""INSERT INTO players (name) VALUES (%s);""", [name])
     connection.commit()
     connection.close()
+
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -71,6 +78,7 @@ def playerStandings():
     connection.close()
     return result
 
+
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
 
@@ -87,6 +95,7 @@ def reportMatch(winner, loser):
     connection.commit()
     connection.close()
  
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
   
@@ -106,26 +115,106 @@ def swissPairings():
     cursor = connection.cursor()
     cursor.execute("""SELECT count(*) FROM v_standings WHERE matches <> 0;""")
     result = cursor.fetchone()
-    connection.close()   
- 
-    if result[0]==0:
-        seed = random.uniform(-1.0, 1.0)
-        connection = connect()
-        cursor = connection.cursor()
-        cursor.execute("""SELECT setseed(%s);""", [seed])
-        cursor.execute("""SELECT player_id, name FROM v_standings ORDER BY random();""")
+
+    if result[0] > 0:
+        # pairs stores pairs of individual players tuples
+        pairs = []
+        
+        # pairings is used to convert pairs into a single tuple
+        pairings = []
+        
+        cursor.execute("""SELECT player_id, name FROM v_standings;""")
         result = cursor.fetchall()
-        connection.close()
-    else:
-        connection = connect()
-        cursor = connection.cursor()
-        cursor.execute("""SELECT player_id, name FROM v_standings ORDER BY wins;""") 
-        result = cursor.fetchall()
-        connection.close()
+        
+        if matchMaker(result, pairs):
+            for pair in pairs:
+                pairings.append(pair[0] + pair[1])
+            connection.close()
+            return pairings
+
+    # Generate a value in python to seed postgres for randomness
+    seed = random.uniform(-1.0, 1.0)
+
+    # Seed postgres with the generated seed
+    cursor.execute("""SELECT setseed(%s);""", [seed])
+
+    cursor.execute("""SELECT player_id, name FROM v_standings ORDER BY random();""")
+    result = cursor.fetchall()
+    connection.close()
 
     # courtesy of 
     # http://stackoverflow.com/questions/756550/multiple-tuple-to-two-pair-tuple-in-python
     # http://stackoverflow.com/questions/509211/explain-pythons-slice-notation
+
+    # We extract the ids and names from the result set
     ids, names =  zip(*result)
+
+    # This line recombines the ids and names into pairs
     return zip(ids[::2], names[::2], ids[1::2], names[1::2]) 
 
+
+def matchMaker(pool, pairs=None):
+    """Recursive function that provides pairings considering rematches using Depth-First Search
+
+    We use a modified depth-first search algorithm to find a combination that prevents rematches.
+
+    Args:
+      pool: The list of player ids to match in reverse order
+      pairs: Recursively gets updated to be the final list of tuples
+    
+    Returns:
+      A list of tuples, each of which contains (id1, id2)
+        id1: the first player's unique id
+        id2: the second player's unique id
+    """
+    if pairs is None:
+        pairs = list()
+
+    # Take the first player
+    player = pool.pop(0)
+
+    # Compare with remaining opponents in pool
+    for opponent in pool:
+        if not hasPlayed(player, opponent):
+            # We keep track of the pairs and update the pool for deeper searches
+            pairs.append([player, opponent])
+            position = pool.index(opponent)
+            pool.remove(opponent)
+
+            if len(pool)==0:
+                # No more players to propagate forward. Goal!
+                return True
+            if matchMaker(pool, pairs):
+                # Reached the goal with this iterative call
+                return True
+            else:
+                # Revert by discarding the current pair and returning the opponent to the pool 
+                pool.insert(position, opponent)
+                pairs.remove([player, opponent])
+    
+    # We are unable to find the result with this pool
+    pool.insert(0, player)
+    return False
+
+
+def hasPlayed(player1, player2):
+    """Simple query to check if two players have played before
+
+    Args:
+      player1, player2: ids of players to check in match history
+
+    Returns:
+      A boolean value which can be
+        True: A match has been found between the two players
+        False: No matches were found between the two players
+    """
+    connection = connect()
+    cursor = connection.cursor()
+    cursor.execute("""SELECT count(*) FROM matches WHERE (player1=%s AND player2=%s) OR (player2=%s AND player1=%s);""", [player1[0], player2[0], player1[0], player2[0]])
+    result = cursor.fetchone()
+    connection.close()
+
+    if result[0]==0:
+        return False
+    else:
+        return True

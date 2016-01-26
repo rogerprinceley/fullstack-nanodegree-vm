@@ -1,17 +1,21 @@
-# rogerprinceley's Swiss Tournament toolkit
+# rogerprinceley's Full Stack Nanodegree repository 
+
+## Completed Projects
+
+### Tournament Project
 This project contains SQL code and python code that provide tools to assist in conducting a tournament around the Swiss Tournament system. This content is delivered as a vagrant package. Please ensure that you vagrant configured on your system before working with this code.
 
-## How to use (Basic Test)
+#### How to use (Basic Test)
 1. Click [here](https://github.com/rogerprinceley/fullstack-nanodegree-vm/archive/master.zip) or on `Download Zip` button above to download the project
 2. Extract the contents of the zip file
-3. Change working directory to vagrant folder: `cd *<extracted location>*/fullstack-nanodegree-vm/vagrant`
+3. Change working directory to vagrant folder: `cd _<extracted location>_/fullstack-nanodegree-vm/vagrant`
 4. Start the vagrant environment: `vagrant up`
 5. Connect the vagrant environment: `vagrant ssh`
-6. Change working directory to vagrant folder: `cd /vagrant`
+6. Change working directory to vagrant folder: `cd /vagrant/tournament`
 7. Setup the database by executing the SQL file: `psql -f tournament.sql`
 8. Execute the basic test code by running: `python.exe tournament_test.py`
 
-## Available python functions
+#### Available python functions
 * `connect()` - Connect to the PostgreSQL database.  Returns a database connection.
 * `deleteMatches()` - Remove all the match records from the database.
 * `deletePlayers()` - Remove all the player records from the database.
@@ -20,9 +24,36 @@ This project contains SQL code and python code that provide tools to assist in c
 * `playerStandings()` - Returns a list of the players and their win records, sorted by wins.
 * `reportMatch(winner, loser)` - Records the outcome of a single match between two players (accepts ids.)
 * `swissPairings()` - Returns a list of pairs of players for the next round of a match.
+* `matchMaker(pool, pairs)` - Recursive Depth-first search like method that updates pairs until pool is empty. Uses hasPlayed(player1, player2).
+* `hasPlayed(player1, player2)` - Checks if the two players passed as arugments have played a match together.
 
-## Project contents - INCOMPLETE
+#### Databases and Views
+##### Tables
+* players - Contains the players participating in the tournament
+* matches - Contains a register of the matches that players have participated in
+* results - Contains the results of matches that have been played
+##### Views
+* v_simple_standings - Simple standings view at best includes match-win percentage
+* v_standings: Uses v_simple_standings to compute Opponent Match Wins (OMW) valuE
+
+#### Project contents
+* `/vagrant/tournament/tournament.sql` - Contains the SQL statements to create necessary tournament database, tables and views
+* `/vagrant/tournament/tournement.py` - Contains all the functions mentioned above
+* `/vagrant/tournament/tournament_test.py` - Basic test script provided along with the starter source for this project
+
+#### Extra credit options attempted
+* Prevent rematches between players
+* When two players have the same number of wins, rank them according to OMW (Opponent Match Wins), the total number of wins by players they have played against.
+
+## Pending Projects
+
+### Catalog Project (Next) 
+
+### Forum Project (Later)
 
 ## References
-This project runs on code provided by the course [Intro to Relational Databases](https://www.udacity.com/course/intro-to-relational-databases--ud197-nd) at [Udacity](http://www.udacity.com)
+
+### Tournament Project
+* The tournament project is based off the course [Intro to Relational Databases](https://www.udacity.com/course/intro-to-relational-databases--ud197-nd) at [Udacity](http://www.udacity.com)
+* The tournament project getting started guide can be found [here](https://docs.google.com/document/d/16lgOm4XprTaKxAa8w02y028oBECOoB1El1ReddADEeY/pub?embedded=true)
 
