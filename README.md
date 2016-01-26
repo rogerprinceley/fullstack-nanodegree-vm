@@ -22,9 +22,9 @@ This project contains SQL and python code that provide tools to assist in conduc
 * `countPlayers()` - Returns the number of players currently registered.
 * `registerPlayer(name)` - Adds a player to the tournament database.
 * `playerStandings()` - Returns a list of the players and their win records, sorted by wins.
-* `reportMatch(winner, loser)` - Records the outcome of a single match between two players (accepts ids.)
+* `reportMatch(winner, loser, outcome=1)` - Records the outcome of a single match between two players (accepts ids.)
 * `swissPairings()` - Returns a list of pairs of players for the next round of a match.
-* `matchMaker(pool, pairs)` - Recursive Depth-first search like method that updates pairs until pool is empty. 
+* `matchMaker(pool, pairs=None)` - Recursive Depth-first search like method that updates pairs until pool is empty. 
 * `hasPlayed(player1, player2)` - Checks if the two players passed as arugments have played a match together.
 
 #### Tables and Views
@@ -45,7 +45,11 @@ This project contains SQL and python code that provide tools to assist in conduc
 #### Extra credit options attempted
 1. Prevent rematches between players
   * Uses a modified Depth-First Search algorithm using a recursive function.
-2. When two players have the same number of wins, rank them according to OMW (Opponent Match Wins), the total number of wins by players they have played against.
+2. Support games where a draw (tied game) is possible. This will require changing the arguments to reportMatch.
+  * Additional argument `outcome` added to reportMatch
+  * 1 (default): denotes player1 wins, 0: denotes a draw, -1: denotes player2 wins
+  * If any other value is provided it assumes the default case i.e., player1 wins
+3. When two players have the same number of wins, rank them according to OMW (Opponent Match Wins), the total number of wins by players they have played against.
   * Implementation does not use points as outlined in the [MTG tiebreaker guide.](https://www.wizards.com/dci/downloads/tiebreakers.pdf)
 
 #### References
