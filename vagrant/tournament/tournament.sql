@@ -35,6 +35,8 @@ SELECT
  P.player_id,
  P.name,
  SUM(CASE WHEN P.player_id = R.winner THEN 1 ELSE 0 END) AS wins,
+ SUM(CASE WHEN (P.player_id = M.player1 OR P.player_id = M.player2) AND P.player_id <> R.winner THEN 1 ELSE 0 END) AS losses,
+ SUM(CASE WHEN (P.player_id = M.player1 OR P.player_id = M.player2) AND R.winner IS NULL THEN 1 ELSE 0 END) AS draws,
  SUM(CASE WHEN P.player_id = M.player1 OR P.player_id = M.player2 THEN 1 ELSE 0 END) AS matches,
  CASE WHEN 
   SUM(CASE WHEN P.player_id = M.player1 OR P.player_id = M.player2 THEN 1 ELSE 0 END) = 0
@@ -64,6 +66,8 @@ SELECT
  P.player_id,
  P.name,
  P.wins,
+ P.losses,
+ P.draws,
  P.matches,
  P.match_wins,
  ROUND(
@@ -96,7 +100,6 @@ SELECT
   ) AS opponent_match_wins
 FROM
  v_simple_standings AS P
-GROUP BY
- P.player_id, P.name, P.wins, P.matches, P.match_wins
 ORDER BY
- P.wins DESC, opponent_match_wins DESC, P.matches;
+ P.wins DESC, opponent_match_wins DESC, P.losses, P.draws DESC, P.matches;
+

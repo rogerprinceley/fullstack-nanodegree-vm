@@ -79,18 +79,29 @@ def playerStandings():
     return result
 
 
-def reportMatch(winner, loser):
+def reportMatch(player1, player2, outcome=1):
     """Records the outcome of a single match between two players.
 
     Args:
-      winner:  the id number of the player who won
-      loser:  the id number of the player who lost
+      player1: the id number of player1
+      player2: the id number of player2
+      outcome: the value indicating match outcome (1: player1 wins, 0: draw, -1: player2 wins)
     """
     connection = connect()
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO matches (player1, player2) VALUES (%s, %s) RETURNING match_id;', [winner, loser])
+    cursor.execute('INSERT INTO matches (player1, player2) VALUES (%s, %s) RETURNING match_id;', [player1, player2])
     result = cursor.fetchone()
     match_id = result[0]
+
+    # We use dict to translate the outcome
+    switcher = {
+        1: player1,
+       -1: player2,
+        0: None
+    }
+
+    winner = switcher.get(outcome, player1)
+    
     cursor.execute('INSERT INTO results (match_id, winner) VALUES (%s, %s);', [match_id, winner])
     connection.commit()
     connection.close()
