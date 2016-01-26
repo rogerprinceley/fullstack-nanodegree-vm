@@ -27,14 +27,15 @@ This project contains SQL and python code that provide tools to assist in conduc
 * `matchMaker(pool, pairs)` - Recursive Depth-first search like method that updates pairs until pool is empty. 
 * `hasPlayed(player1, player2)` - Checks if the two players passed as arugments have played a match together.
 
-#### Databases and Views
+#### Tables and Views
 ##### Tables
 * players - Contains the players participating in the tournament
 * matches - Contains a register of the matches that players have participated in
 * results - Contains the results of matches that have been played
+
 ##### Views
 * v_simple_standings - Simple standings view at best includes match-win percentage
-* v_standings: Uses v_simple_standings to compute Opponent Match Wins (OMW) valuE
+* v_standings: Uses v_simple_standings to compute Opponent Match Wins (OMW) value
 
 #### Project contents
 * `/vagrant/tournament/tournament.sql` - SQL statements needed to setup postgresql
